@@ -91,8 +91,19 @@ class Generator:
     def register(self) -> None:
         app = self.app
 
-        @app.on_message(config.cmd_filter(["gen", "generate"]) & filters.user(list(config.ADMIN_IDS)))
+        @app.on_message(config.cmd_filter(["gen", "generate"]))
         async def _gen_cmd(_cli: Client, msg: Message):
+            if config.ADMIN_IDS and msg.from_user and msg.from_user.id not in config.ADMIN_IDS:
+                await msg.reply_text(
+                    "⛔ **Access denied** — sirf admins hi polls generate kar sakte hain."
+                )
+                return
+            if not config.ADMIN_IDS:
+                await msg.reply_text(
+                    "⚠️ OWNER_ID environment variable set nahi hai!\n"
+                    "Apna Telegram user ID `OWNER_ID=123456789` ke roop me set karo."
+                )
+                return
             if not config.PRACTICE_CHAT:
                 await msg.reply_text(
                     "⚠️ PRACTICE_CHAT set nahi hai — polls kahan post karne hain?"

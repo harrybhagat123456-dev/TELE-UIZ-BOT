@@ -53,8 +53,19 @@ async def main() -> None:
     # 2) Scanner (commands registered below)
     scanner = Scanner(app, db)
 
-    @app.on_message(config.cmd_filter("scan") & filters.user(list(config.ADMIN_IDS)))
+    @app.on_message(config.cmd_filter("scan"))
     async def _scan(_cli: Client, msg: Message):
+        if config.ADMIN_IDS and msg.from_user and msg.from_user.id not in config.ADMIN_IDS:
+            await msg.reply_text(
+                "⛔ **Access denied** — sirf admins hi scan kar sakte hain."
+            )
+            return
+        if not config.ADMIN_IDS:
+            await msg.reply_text(
+                "⚠️ OWNER_ID environment variable set nahi hai!\n"
+                "Apna Telegram user ID `OWNER_ID=123456789` ke roop me set karo."
+            )
+            return
         args = (msg.text or "").split(maxsplit=1)
         chats = []
         if len(args) > 1:
@@ -125,14 +136,17 @@ async def main() -> None:
     tracker.start_worker()
 
     # 6) Web dashboard (Koyeb health check + flashcards UI)
-    from web import start_web
+    from web import start_web, set_bot
 
+    set_bot(app, asyncio.get_running_loop())
     start_web(db, in_thread=True)
 
-    log.info("=== Bot ready. Commands: /scan /gen /stats /wrong /review ===")
+    log.info("=== Bot ready. Commands: /start /scan /gen /stats /wrong /review ===")
 
-    # Keep running forever
-    await asyncio.Event().wait()
+    # Keep running until SIGINT/SIGTERM
+    from pyrogram import idle
+    await idle()
+    await app.stop()
 
 
 if __name__ == "__main__":
