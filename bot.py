@@ -146,7 +146,14 @@ async def main() -> None:
     # Keep running until SIGINT/SIGTERM
     from pyrogram import idle
     await idle()
-    await app.stop()
+
+    # Graceful shutdown — never let a teardown error mask a clean exit
+    for label, coro in (("app.stop", app.stop), ("db.close", db.close)):
+        try:
+            await coro()
+        except Exception as e:  # noqa: BLE001
+            log.warning("shutdown %s failed: %s", label, e)
+    log.info("shutdown complete")
 
 
 if __name__ == "__main__":

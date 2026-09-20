@@ -113,6 +113,13 @@ class Database:
         await self._ensure_indexes()
         log.info("MongoDB connected: %s", self.db_name)
 
+    async def close(self) -> None:
+        """Close the Mongo client. Safe to call even if never connected."""
+        if self.client is not None:
+            self.client.close()
+            self.client = None
+            log.info("MongoDB connection closed")
+
     async def _ensure_indexes(self) -> None:
         assert self.db is not None
         await self.db.questions.create_index([("subject", 1), ("topic", 1)])
