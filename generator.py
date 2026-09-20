@@ -91,7 +91,7 @@ class Generator:
     def register(self) -> None:
         app = self.app
 
-        @app.on_message(filters.command(["gen", "generate"]) & filters.user(list(config.ADMIN_IDS)))
+        @app.on_message(config.cmd_filter(["gen", "generate"]) & filters.user(list(config.ADMIN_IDS)))
         async def _gen_cmd(_cli: Client, msg: Message):
             if not config.PRACTICE_CHAT:
                 await msg.reply_text(

@@ -4,6 +4,7 @@
 
 import os
 from dotenv import load_dotenv
+from pyrogram import filters
 
 load_dotenv()
 
@@ -73,6 +74,18 @@ DASHBOARD_SECRET = os.getenv("DASHBOARD_SECRET", "").strip()
 DASH_ALLOWED_TG_IDS = set(_list("DASH_ALLOWED_TG_IDS")) | set(OWNER_ID)
 
 # ─── Sanity checks (non-fatal; warns only) ──────────────────────────────────────
+# ─── Security Keys / Helpers ───────────────────────────────────────────────────
+def cmd_filter(cmds):
+    r"""
+    Pyrofork 2.3.69 workaround: filters.command() is broken and returns False.
+    Use regex matching ^/(cmd1|cmd2)(?:@\w+)?(?:\s+.*)?$
+    """
+    if isinstance(cmds, str):
+        cmds = [cmds]
+    pat = r"^/(" + "|".join(cmds) + r")" + r"(?:@\w+)?(?:\s+.*)?$"
+    return filters.text & filters.regex(pat)
+
+
 if not all([API_ID, API_HASH, BOT_TOKEN]):
     print("[CONFIG] WARN: API_ID/API_HASH/BOT_TOKEN missing — bot will not start")
 

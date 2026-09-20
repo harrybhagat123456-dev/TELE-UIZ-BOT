@@ -53,7 +53,7 @@ async def main() -> None:
     # 2) Scanner (commands registered below)
     scanner = Scanner(app, db)
 
-    @app.on_message(filters.command("scan") & filters.user(list(config.ADMIN_IDS)))
+    @app.on_message(config.cmd_filter("scan") & filters.user(list(config.ADMIN_IDS)))
     async def _scan(_cli: Client, msg: Message):
         args = (msg.text or "").split(maxsplit=1)
         chats = []

@@ -1,13 +1,14 @@
 """
 Telegram-side dashboard commands (until the web dashboard is built).
 
+/start      — welcome message + list of commands
+/help       — usage guide
 /stats      — overall accuracy, streak, subject-wise breakdown
 /wrong      — latest wrong questions (with options, correct answer, explanation)
 /bookmarks  — saved wrong questions
 /bm SC12    — toggle bookmark on a question
 /leaderboard— top users
 /review     — SM-2 spaced-repetition queue (due flashcards)
-/help       — usage
 """
 
 from __future__ import annotations
@@ -63,23 +64,30 @@ class Commands:
     def register(self) -> None:
         app = self.app
 
-        @app.on_message(filters.command("help"))
-        async def _help(_c: Client, m: Message):
-            await m.reply_text(
-                "🤖 **Quiz Practice Bot**\n\n"
-                "**Admin commands**\n"
-                "• `/scan @sourcechannel` — scan channel & build question bank\n"
-                "• `/gen SC1-90` — generate practice polls (asks subject + topic)\n\n"
-                "**User commands**\n"
-                "• `/stats` — your accuracy & streak\n"
-                "• `/wrong` — questions you got wrong (with explanations)\n"
-                "• `/bookmarks` — saved questions\n"
-                "• `/bm SC12` — bookmark/unbookmark a question\n"
-                "• `/review` — spaced-repetition flashcards (due today)\n"
-                "• `/leaderboard` — top scorers"
+        @app.on_message(config.cmd_filter(["start", "help"]))
+        async def _start_help(_c: Client, m: Message):
+            name = m.from_user.first_name if m.from_user else "User"
+            msg_text = (
+                f"👋 **Hello {name}! Welcome to Quiz Practice Bot** 🧠\n\n"
+                f"Is bot se aap quiz polls solve karke wrong questions tracking, "
+                f"spaced repetition revision (SM-2) aur flashcards view kar sakte ho.\n\n"
+                f"🛠️ **Available Commands:**\n\n"
+                f"👤 **User Commands:**\n"
+                f"• `/stats` — Teri accuracy, correct/attempted & streak\n"
+                f"• `/wrong` — Galat kiye hue questions with explanations\n"
+                f"• `/review` — Spaced Repetition (SM-2) flashcards revision\n"
+                f"• `/bookmarks` — Saved wrong questions list\n"
+                f"• `/bm SC12` — Question SC12 ko bookmark / unbookmark karo\n"
+                f"• `/leaderboard` — Top scorers list\n\n"
+                f"⚡ **Admin Commands:**\n"
+                f"• `/scan @sourcechannel` — Source channel scan karke questions store karo\n"
+                f"• `/gen SC1-90` — Practice channel me 90 polls generate karo\n\n"
+                f"🌐 **Web Dashboard:**\n"
+                f"Koyeb deploy link pe Subject → Topic → Flashcards (Flip Card) view milta hai."
             )
+            await m.reply_text(msg_text)
 
-        @app.on_message(filters.command("stats"))
+        @app.on_message(config.cmd_filter("stats"))
         async def _stats(_c: Client, m: Message):
             if not m.from_user:
                 return
@@ -117,7 +125,7 @@ class Commands:
                 text += "\n\n**Subject-wise**\n" + "\n".join(rows)
             await m.reply_text(text)
 
-        @app.on_message(filters.command("wrong"))
+        @app.on_message(config.cmd_filter("wrong"))
         async def _wrong(_c: Client, m: Message):
             if not m.from_user:
                 return
@@ -146,7 +154,7 @@ class Commands:
 
                     await asyncio.sleep(0.3)
 
-        @app.on_message(filters.command("bookmarks"))
+        @app.on_message(config.cmd_filter("bookmarks"))
         async def _bookmarks(_c: Client, m: Message):
             if not m.from_user:
                 return
@@ -160,7 +168,7 @@ class Commands:
 
                 await asyncio.sleep(0.4)
 
-        @app.on_message(filters.command("bm"))
+        @app.on_message(config.cmd_filter("bm"))
         async def _bm(_c: Client, m: Message):
             if not m.from_user:
                 return
@@ -182,7 +190,7 @@ class Commands:
             on = await self.db.toggle_bookmark(cq.from_user.id, code)
             await cq.answer(f"{'Bookmarked' if on else 'Removed'} {code}", show_alert=False)
 
-        @app.on_message(filters.command("review"))
+        @app.on_message(config.cmd_filter("review"))
         async def _review(_c: Client, m: Message):
             if not m.from_user:
                 return
@@ -211,7 +219,7 @@ class Commands:
                     f"{'' if d.get('interval') else ' — wrong earlier'})\n\n{card}"
                 )
 
-        @app.on_message(filters.command("leaderboard"))
+        @app.on_message(config.cmd_filter("leaderboard"))
         async def _lb(_c: Client, m: Message):
             rows = await self.db.leaderboard(limit=10)
             if not rows:
