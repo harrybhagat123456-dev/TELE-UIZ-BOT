@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Dashboard — Subjects</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #0f1117; color: #e6e9f0;
+    min-height: 100vh; padding: 1.5rem 1rem 3rem;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  header.top { display: flex; justify-content: space-between; align-items: center;
+               margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem; }
+  header.top h1 { font-size: 1.3rem; }
+  .toplinks a { color: #8b92a7; text-decoration: none; font-size: 0.8rem; margin-left: 1rem; }
+  .toplinks a:hover { color: #e6e9f0; }
+
+  .stats-bar { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .stat {
+    background: #1a1d28; border: 1px solid #2a2e3d; border-radius: 12px;
+    flex: 1 1 110px; padding: 0.85rem 1rem; text-align: center;
+  }
+  .stat b { display: block; font-size: 1.3rem; }
+  .stat span { font-size: 0.7rem; color: #8b92a7; }
+  .stat.good b { color: #4ade80; } .stat.bad b { color: #f87171; }
+  .stat.fire b { color: #fbbf24; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+  .card {
+    background: #1a1d28; border: 1px solid #2a2e3d; border-radius: 14px;
+    padding: 1.15rem; text-decoration: none; color: inherit;
+    display: flex; flex-direction: column; gap: 0.5rem;
+    transition: transform 0.15s, border-color 0.15s;
+  }
+  a.card:hover { transform: translateY(-2px); border-color: #5b8cff; }
+  .card h3 { font-size: 1.05rem; letter-spacing: 0.02em; }
+  .meta { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .pill {
+    font-size: 0.7rem; padding: 0.2rem 0.55rem; border-radius: 999px;
+    background: #12141c; border: 1px solid #2a2e3d; color: #8b92a7;
+  }
+  .pill.red { color: #f87171; border-color: rgba(248,113,113,0.35);
+              background: rgba(248,113,113,0.08); }
+  .empty { color: #5c6378; text-align: center; padding: 3rem 1rem; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>🧠 Quiz Dashboard</h1>
+    <div class="toplinks">
+      <a href="/">Subjects</a>
+      <a href="/logout">Logout ({{ uid }})</a>
+    </div>
+  </header>
+
+  <div class="stats-bar">
+    <div class="stat"><b>{{ stats.attempted }}</b><span>Attempted</span></div>
+    <div class="stat good"><b>{{ stats.correct }}</b><span>Correct</span></div>
+    <div class="stat {% if stats.accuracy >= 70 %}good{% elif stats.accuracy < 40 %}bad{% endif %}">
+      <b>{{ "%.1f"|format(stats.accuracy) }}%</b><span>Accuracy</span>
+    </poll.stat>
+    </div>
+    <div class="stat fire"><b>{{ stats.streak }} 🔥</b><span>Streak (best {{ stats.best_streak }})</span></div>
+    <div class="stat"><b>{{ stats.bookmarks }}</b><span>Bookmarks</span></</stats-bar>
+  </div>
+
+  <h2 style="font-size:1rem; color:#8b92a7; margin-bottom:0.75rem;">SUBJECTS</h2>
+  {% if subjects %}
+  <div class="grid">
+    {% for s in subjects %}
+    <a class="card" href="/subject/{{ s.name }}">
+      <h3>{{ s.name }}</h3>
+      <div class="meta">
+        <span class="pill">{{ s.total }} questions</span>
+        <span class="pill">{{ s.topics }} topics</span>
+        {% if s.wrong %}<span class="pill red">{{ s.wrong }} wrong</span>{% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+    <div class="empty">
+      Abhi koi subject nahi hai. Pehle <code>/scan @sourcechannel</code> chalao,<br>
+      phir <code>/gen SC1-90</code> se questions post karo, phir yahan stats aayenge.
+    </div>
+  {% endif %}
+</div>
+</body>
+</html>

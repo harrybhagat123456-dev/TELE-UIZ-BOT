@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Practice — Login</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #0f1117;
+    color: #e6e9f0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .card {
+    background: #1a1d28;
+    border: 1px solid #2a2e3d;
+    border-radius: 16px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  h1 { font-size: 1.4rem; margin-bottom: 0.3rem; }
+  p.sub { color: #8b92a7; font-size: 0.85rem; margin-bottom: 1.5rem; }
+  label { display: block; font-size: 0.8rem; color: #8b92a7; margin: 1rem 0 0.35rem; }
+  input {
+    width: 100%; padding: 0.7rem 0.9rem; border-radius: 10px;
+    border: 1px solid #2a2e3d; background: #12141c; color: #e6e9f0;
+    font-size: 0.95rem; outline: none;
+  }
+  input:focus { border-color: #5b8cff; }
+  .err {
+    background: rgba(255,80,80,0.1); border: 1px solid rgba(255,80,80,0.35);
+    color: #ff9b9b; font-size: 0.8rem; padding: 0.6rem 0.8rem;
+    border-radius: 8px; margin-top: 1rem;
+  }
+  button {
+    width: 100%; margin-top: 1.5rem; padding: 0.75rem;
+    border: none; border-radius: 10px; cursor: pointer;
+    background: #5b8cff; color: #fff; font-weight: 600; font-size: 0.95rem;
+  }
+  button:hover { background: #4a7bef; }
+  .hint { margin-top: 1rem; font-size: 0.75rem; color: #5c6378; text-align: center; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>🧠 Quiz Dashboard</h1>
+    <p class="sub">Subject → Topic → Wrong-answer flashcards (spaced repetition)</p>
+
+    {% if error %}<div class="err">⚠️ {{ error }}</div>{% endif %}
+
+    <form method="post">
+      <label for="uid">Telegram User ID</label>
+      <input id="uid" name="uid" placeholder="e.g. 123456789" required inputmode="numeric">
+
+      <label for="secret">Dashboard Secret</label>
+      <input id="secret" name="secret" type="password" placeholder="DASHBOARD_SECRET" required>
+
+      <button type="submit">Login →</button>
+    </form>
+    <p class="hint">User ID @userinfobot se milta hai · Secret deploy pe set hota hai</p>
+  </div>
+</body>
+</html>

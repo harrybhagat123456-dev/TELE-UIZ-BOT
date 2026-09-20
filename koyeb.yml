@@ -1,0 +1,38 @@
+# ── Koyeb Deployment Spec for Quiz Practice Bot ──────────────────────
+# Deploy as a single Web Service on Koyeb (Bot + Flask Dashboard on PORT)
+
+name: quiz-practice-bot
+services:
+  - name: bot-service
+    type: web
+    ports:
+      - port: 8080
+        protocol: http
+        path: /health
+    build:
+      type: dockerfile
+      dockerfile: Dockerfile
+    env:
+      - key: PORT
+        value: "8080"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      # ── REQUIRED ─────────────────────────────────────────
+      - key: API_ID
+        value: "YOUR_API_ID"
+      - key: API_HASH
+        value: "YOUR_API_HASH"
+      - key: BOT_TOKEN
+        value: "YOUR_BOT_TOKEN"
+      - key: MONGO_DB
+        value: "mongodb+srv://..."
+      - key: DB_NAME
+        value: "quiz_practice_bot"
+      - key: PRACTICE_CHAT
+        value: "@your_practice_channel_or_id"
+      - key: OWNER_ID
+        value: "123456789"
+      - key: DASHBOARD_SECRET
+        value: "mysecretkey123"
+      - key: DASH_ALLOWED_TG_IDS
+        value: "123456789"
